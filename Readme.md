@@ -1,6 +1,6 @@
 # analytics.js-integration-parsely [![Build Status][ci-badge]][ci-link]
 
-[Atatus](https://www.parsely.com) integration for [Analytics.js][].
+[Parsely](https://www.parsely.com) integration for [Analytics.js][].
 
 ## License
 
