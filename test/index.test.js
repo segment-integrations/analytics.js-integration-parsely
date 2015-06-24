@@ -29,7 +29,6 @@ describe('Parsely', function() {
 
   it('should have the right settings', function() {
     analytics.compare(Parsely, integration('Parsely')
-        .assumesPageview()
         .global('parsely')
         .global('PARSELY')
         .option('apikey', ''));
@@ -52,22 +51,21 @@ describe('Parsely', function() {
     beforeEach(function(done) {
       analytics.once('ready', done);
       analytics.initialize();
-      analytics.page();
     });
 
-    describe('#page', function() {
-      it('should create the data-parsely-site meta tag', function() {
+    describe('#loaded', function() {
+      it('should have created the data-parsely-site meta tag', function() {
         var div_exists = document.head.innerHTML.indexOf('data-parsely-site' > -1);
         analytics.assert(div_exists);
       });
 
-      it('should load p.js', function() {
-        var script_exists = document.head.innerHTML.indexOf('p.js' > -1);
-        analytics.assert(script_exists);
+      it('should have loaded p.js', function() {
+        var div_exists = document.head.innerHTML.indexOf('p.js' > -1);
+        analytics.assert(div_exists);
       });
 
       it('should have the right apikey', function() {
-        analytics.assert(window.parsely.apikey === 'example.com');
+        analytics.assert(window.parsely.apikey === options.apikey);
       });
     });
   });
