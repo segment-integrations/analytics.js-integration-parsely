@@ -1,3 +1,4 @@
+'use strict';
 
 var Analytics = require('analytics.js').constructor;
 var integration = require('analytics.js-integration');

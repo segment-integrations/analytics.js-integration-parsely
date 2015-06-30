@@ -3,8 +3,7 @@
 
   "rules": {
     "global-strict": 0,
-    "max-len": 0,
-    "strict": 1
+    "max-len": 0
   },
 
   "globals": {
