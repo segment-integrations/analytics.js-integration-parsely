@@ -9,7 +9,7 @@ describe('Parsely', function() {
   var analytics;
   var parsely;
   var options = {
-    apikey: 'example.com'
+    apiKey: 'example.com'
   };
 
   beforeEach(function() {
@@ -31,7 +31,7 @@ describe('Parsely', function() {
     analytics.compare(Parsely, integration('Parsely')
         .global('parsely')
         .global('PARSELY')
-        .option('apikey', ''));
+        .option('apiKey', ''));
   });
 
   describe('before loading', function() {
@@ -64,8 +64,8 @@ describe('Parsely', function() {
         analytics.assert(div_exists);
       });
 
-      it('should have the right apikey', function() {
-        analytics.assert(window.parsely.apikey === options.apikey);
+      it('should have the right apiKey', function() {
+        analytics.assert(window.parsely.apikey === options.apiKey);
       });
     });
   });
