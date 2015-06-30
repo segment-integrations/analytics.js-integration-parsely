@@ -43,7 +43,35 @@ describe('Parsely', function() {
   describe('before loading', function() {
     beforeEach(function() {
       analytics.stub(parsely, 'load');
+    });
+
+    it('should create a Parsely meta tag', function() {
+      var isLoaded = function() {
+        return !!filter(document.getElementsByTagName('meta'), isParselyMetaTag).length;
+      };
+
+      analytics.assert(!isLoaded());
+      parsely.initialize();
+      analytics.assert(isLoaded());
+    });
+
+    it('should set window.parsely if not already set', function() {
+      analytics.assert(window.parsely === undefined);
       analytics.initialize();
+      analytics.assert(window.parsely.apikey);
+    });
+
+    it('should not set window.parsely if already set', function() {
+      var parsely = { apikey: 'whoo' };
+      window.parsely = parsely;
+      analytics.initialize();
+      analytics.assert(window.parsely === parsely);
+    });
+
+    it('should set window.parsely.apikey', function() {
+      analytics.assert(!window.parsely);
+      analytics.initialize();
+      analytics.assert(window.parsely.apikey === options.apiKey);
     });
   });
 
@@ -51,21 +79,10 @@ describe('Parsely', function() {
     it('should load', function(done) {
       analytics.load(parsely, done);
     });
+  });
 
-    it('should create a Parsely meta tag', function(done) {
-      var isLoaded = function() {
-        return !!filter(document.getElementsByTagName('meta'), isParselyMetaTag).length;
-      };
-
-      analytics.assert(!isLoaded());
-      analytics.once('ready', function() {
-        analytics.assert(isLoaded());
-        done();
-      });
-      analytics.initialize();
-    });
-
-    it('should load p.js', function(done) {
+  describe('after loading', function() {
+    it('should have loaded p.js', function(done) {
       var isPjsScript = function(element) {
         return !!element && (/p.js$/).test(element.src);
       };
@@ -76,34 +93,6 @@ describe('Parsely', function() {
       analytics.assert(!isLoaded());
       analytics.once('ready', function() {
         analytics.assert(isLoaded());
-        done();
-      });
-      analytics.initialize();
-    });
-
-    it('should not set window.parsely if already set', function(done) {
-      var parsely = { apikey: 'whoo' };
-      window.parsely = parsely;
-      analytics.once('ready', function() {
-        analytics.assert(window.parsely === parsely);
-        done();
-      });
-      analytics.initialize();
-    });
-
-    it('should set window.parsely if not already set', function(done) {
-      analytics.assert(window.parsely === undefined);
-      analytics.once('ready', function() {
-        analytics.assert(window.parsely.apikey);
-        done();
-      });
-      analytics.initialize();
-    });
-
-    it('should set window.parsely.apikey', function(done) {
-      analytics.assert(!window.parsely);
-      analytics.once('ready', function() {
-        analytics.assert(window.parsely.apikey === options.apiKey);
         done();
       });
       analytics.initialize();
