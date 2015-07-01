@@ -1,6 +1,6 @@
 'use strict';
 
-var Analytics = require('analytics.js').constructor;
+var Analytics = require('analytics.js-core').constructor;
 var Parsely = require('../lib/');
 var each = require('each');
 var filter = require('component/select');

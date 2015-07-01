@@ -2,7 +2,7 @@
   "name": "analytics.js-integration-parsely",
   "repo": "segment-integrations/analytics.js-integration-parsely",
   "description": "The Parsely analytics.js integration.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {
@@ -13,7 +13,7 @@
   "development": {
     "component/select": "^0.0.1",
     "ndhoule/each": "^1.0.3",
-    "segmentio/analytics.js": "*",
+    "segmentio/analytics.js-core": "^2.10.0",
     "segmentio/analytics.js-integration-tester": "1.4.x",
     "segmentio/clear-env": "0.2.x"
   }
