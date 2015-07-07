@@ -1,15 +1,18 @@
+'use strict';
 
-var Analytics = require('analytics.js').constructor;
+var Analytics = require('analytics.js-core').constructor;
+var Parsely = require('../lib/');
+var each = require('each');
+var filter = require('component/select');
 var integration = require('analytics.js-integration');
 var sandbox = require('clear-env');
 var tester = require('analytics.js-integration-tester');
-var Parsely = require('../lib/');
 
 describe('Parsely', function() {
   var analytics;
   var parsely;
   var options = {
-    apikey: 'example.com'
+    apiKey: 'example.com'
   };
 
   beforeEach(function() {
@@ -24,21 +27,51 @@ describe('Parsely', function() {
     analytics.restore();
     analytics.reset();
     parsely.reset();
+    each(function(element) {
+      document.head.removeChild(element);
+    }, filter(document.head.getElementsByTagName('meta'), isParselyMetaTag));
     sandbox();
   });
 
   it('should have the right settings', function() {
     analytics.compare(Parsely, integration('Parsely')
-        .assumesPageview()
-        .global('parsely')
-        .global('PARSELY')
-        .option('apikey', ''));
+      .global('parsely')
+      .global('PARSELY')
+      .option('apiKey', ''));
   });
 
   describe('before loading', function() {
     beforeEach(function() {
       analytics.stub(parsely, 'load');
+    });
+
+    it('should create a Parsely meta tag', function() {
+      var isLoaded = function() {
+        return !!filter(document.getElementsByTagName('meta'), isParselyMetaTag).length;
+      };
+
+      analytics.assert(!isLoaded());
+      parsely.initialize();
+      analytics.assert(isLoaded());
+    });
+
+    it('should set window.parsely if not already set', function() {
+      analytics.assert(window.parsely === undefined);
       analytics.initialize();
+      analytics.assert(window.parsely.apikey);
+    });
+
+    it('should not set window.parsely if already set', function() {
+      var parsely = { apikey: 'whoo' };
+      window.parsely = parsely;
+      analytics.initialize();
+      analytics.assert(window.parsely === parsely);
+    });
+
+    it('should set window.parsely.apikey', function() {
+      analytics.assert(!window.parsely);
+      analytics.initialize();
+      analytics.assert(window.parsely.apikey === options.apiKey);
     });
   });
 
@@ -49,26 +82,24 @@ describe('Parsely', function() {
   });
 
   describe('after loading', function() {
-    beforeEach(function(done) {
-      analytics.once('ready', done);
+    it('should have loaded p.js', function(done) {
+      var isPjsScript = function(element) {
+        return !!element && (/p.js$/).test(element.src);
+      };
+      var isLoaded = function() {
+        return !!filter(document.getElementsByTagName('script'), isPjsScript).length;
+      };
+
+      analytics.assert(!isLoaded());
+      analytics.once('ready', function() {
+        analytics.assert(isLoaded());
+        done();
+      });
       analytics.initialize();
-      analytics.page();
-    });
-
-    describe('#page', function() {
-      it('should create the data-parsely-site meta tag', function() {
-        var div_exists = document.head.innerHTML.indexOf('data-parsely-site' > -1);
-        analytics.assert(div_exists);
-      });
-
-      it('should load p.js', function() {
-        var script_exists = document.head.innerHTML.indexOf('p.js' > -1);
-        analytics.assert(script_exists);
-      });
-
-      it('should have the right apikey', function() {
-        analytics.assert(window.parsely.apikey === 'example.com');
-      });
     });
   });
 });
+
+function isParselyMetaTag(element) {
+  return !!(element && element.getAttribute('data-parsely-site'));
+}
