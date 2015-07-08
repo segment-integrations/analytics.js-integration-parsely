@@ -1,4 +1,10 @@
 
+1.0.5 / 2015-07-07
+==================
+
+  * Load script using current protocol
+  * Changing tag source
+
 1.0.4 / 2015-06-30
 ==================
 
