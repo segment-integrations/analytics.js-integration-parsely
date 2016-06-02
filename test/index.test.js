@@ -1,12 +1,12 @@
 'use strict';
 
-var Analytics = require('analytics.js-core').constructor;
+var Analytics = require('@segment/analytics.js-core').constructor;
 var Parsely = require('../lib/');
-var each = require('each');
-var filter = require('component/select');
-var integration = require('analytics.js-integration');
-var sandbox = require('clear-env');
-var tester = require('analytics.js-integration-tester');
+var each = require('@ndhoule/each');
+var filter = require('array-filter');
+var integration = require('@segment/analytics.js-integration');
+var sandbox = require('@segment/clear-env');
+var tester = require('@segment/analytics.js-integration-tester');
 
 describe('Parsely', function() {
   var analytics;
