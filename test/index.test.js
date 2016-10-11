@@ -7,12 +7,16 @@ var filter = require('array-filter');
 var integration = require('@segment/analytics.js-integration');
 var sandbox = require('@segment/clear-env');
 var tester = require('@segment/analytics.js-integration-tester');
+var cookie = require('component-cookie');
 
 describe('Parsely', function() {
   var analytics;
   var parsely;
   var options = {
-    apiKey: 'example.com'
+    apiKey: 'example.com',
+    dynamicTracking: false,
+    inPixelMetadata: false,
+    trackEvents: false
   };
 
   beforeEach(function() {
@@ -31,13 +35,16 @@ describe('Parsely', function() {
       document.head.removeChild(element);
     }, filter(document.head.getElementsByTagName('meta'), isParselyMetaTag));
     sandbox();
+    clearCookies();
   });
 
   it('should have the right settings', function() {
     analytics.compare(Parsely, integration('Parsely')
-      .global('parsely')
       .global('PARSELY')
-      .option('apiKey', ''));
+      .option('apiKey', '')
+      .option('dynamicTracking', false)
+      .option('inPixelMetadata', false)
+      .option('trackEvents', false));
   });
 
   describe('before loading', function() {
@@ -55,41 +62,22 @@ describe('Parsely', function() {
       analytics.assert(isLoaded());
     });
 
-    it('should set window.parsely if not already set', function() {
-      analytics.assert(window.parsely === undefined);
+    it('should set window.PARSELY if not already set', function() {
+      analytics.assert(window.PARSELY === undefined);
       analytics.initialize();
-      analytics.assert(window.parsely.apikey);
-    });
-
-    it('should not set window.parsely if already set', function() {
-      var parsely = { apikey: 'whoo' };
-      window.parsely = parsely;
-      analytics.initialize();
-      analytics.assert(window.parsely === parsely);
-    });
-
-    it('should set window.parsely.apikey', function() {
-      analytics.assert(!window.parsely);
-      analytics.initialize();
-      analytics.assert(window.parsely.apikey === options.apiKey);
+      analytics.assert(window.PARSELY);
     });
   });
 
   describe('loading', function() {
     it('should load', function(done) {
+      window.PARSELY = {};
       analytics.load(parsely, done);
     });
   });
 
-  describe('after loading', function() {
-    it('should have loaded p.js', function(done) {
-      var isPjsScript = function(element) {
-        return !!element && (/p.js$/).test(element.src);
-      };
-      var isLoaded = function() {
-        return !!filter(document.getElementsByTagName('script'), isPjsScript).length;
-      };
-
+  describe('initialization', function() {
+    it('should load p.js', function(done) {
       analytics.assert(!isLoaded());
       analytics.once('ready', function() {
         analytics.assert(isLoaded());
@@ -97,9 +85,118 @@ describe('Parsely', function() {
       });
       analytics.initialize();
     });
+
+    it('should set autotrack to false if dynamic tracking is enabled', function(done) {
+      parsely.options.dynamicTracking = true;
+      analytics.initialize();
+      analytics.assert(window.PARSELY.autotrack === false);
+      done();
+    });
+  });
+
+  describe('after loading', function() {
+    beforeEach(function(done) {
+      analytics.once('ready', done);
+      analytics.initialize();
+    });
+
+    describe('page', function() {
+      beforeEach(function() {
+        analytics.stub(window.PARSELY, 'beacon');
+        analytics.stub(window.PARSELY.beacon, 'trackPageView');
+      });
+
+      it('should do nothing if dynamic tracking is not enabled', function() {
+        analytics.page();
+        analytics.didNotCall(window.PARSELY.beacon.trackPageView);
+      });
+
+      it('should call page if dynamic tracking is enabled', function() {
+        parsely.options.dynamicTracking = true;
+        analytics.page();
+        analytics.called(window.PARSELY.beacon.trackPageView);
+      });
+
+      it('should not pass metadata when not enabled', function() {
+        parsely.options.dynamicTracking = true;
+        analytics.page({
+          author: 'Chris Sperandio'
+        });
+        var args = window.PARSELY.beacon.trackPageView.args;
+        analytics.assert(!args[0][0].metadata);
+      });
+
+      it('should pass metadata when enabled', function() {
+        parsely.options.dynamicTracking = true;
+        parsely.options.inPixelMetadata = true;
+        analytics.page({
+          author: 'Chris Sperandio'
+        });
+        var args = window.PARSELY.beacon.trackPageView.args;
+        analytics.deepEqual(args[0][0].metadata, {
+          creator: 'Chris Sperandio',
+          url: document.location.href
+        });
+      });
+    });
+
+    describe('track', function() {
+      beforeEach(function() {
+        analytics.stub(window.PARSELY, 'beacon');
+        analytics.stub(window.PARSELY.beacon, 'trackPageView');
+      });
+
+      it('should do nothing if events are not enabled', function() {
+        analytics.track('test');
+        analytics.didNotCall(window.PARSELY.beacon.trackPageView);
+      });
+
+      it('should send events if enabled', function() {
+        parsely.options.trackEvents = true;
+        analytics.track('test');
+        analytics.called(window.PARSELY.beacon.trackPageView);
+      });
+
+      it('should send event name as `action`', function() {
+        parsely.options.trackEvents = true;
+        analytics.track('test');
+        var args = window.PARSELY.beacon.trackPageView.args;
+        analytics.assert(args[0][0].action === 'test');
+      });
+
+      it('should send event properties as `data`', function() {
+        parsely.options.trackEvents = true;
+        analytics.track('test', { testing: 'test' });
+        var args = window.PARSELY.beacon.trackPageView.args;
+        analytics.deepEqual(args[0][0].data, { testing: 'test' });
+      });
+    });
   });
 });
 
 function isParselyMetaTag(element) {
   return !!(element && element.getAttribute('data-parsely-site'));
+}
+
+function isPjsScript(element) {
+  return !!element && (/p.js$/).test(element.src);
+}
+
+function isLoaded() {
+  return !!filter(document.getElementsByTagName('script'), isPjsScript).length;
+}
+
+/**
+ * Fully Clear Cookies.
+ *
+ * Sandbox only removes the values, and Parsely's script errors
+ * on empty values for their cookie keys
+ */
+
+function clearCookies() {
+  var cookies = cookie();
+  // eslint-disable-next-line guard-for-in
+  for (var name in cookies) {
+    cookie(name, null, { path: '/' });
+  }
 }
