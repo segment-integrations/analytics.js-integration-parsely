@@ -7,7 +7,6 @@ var filter = require('array-filter');
 var integration = require('@segment/analytics.js-integration');
 var sandbox = require('@segment/clear-env');
 var tester = require('@segment/analytics.js-integration-tester');
-var cookie = require('component-cookie');
 
 describe('Parsely', function() {
   var analytics;
@@ -35,7 +34,6 @@ describe('Parsely', function() {
       document.head.removeChild(element);
     }, filter(document.head.getElementsByTagName('meta'), isParselyMetaTag));
     sandbox();
-    clearCookies();
   });
 
   it('should have the right settings', function() {
@@ -184,19 +182,4 @@ function isPjsScript(element) {
 
 function isLoaded() {
   return !!filter(document.getElementsByTagName('script'), isPjsScript).length;
-}
-
-/**
- * Fully Clear Cookies.
- *
- * Sandbox only removes the values, and Parsely's script errors
- * on empty values for their cookie keys
- */
-
-function clearCookies() {
-  var cookies = cookie();
-  // eslint-disable-next-line guard-for-in
-  for (var name in cookies) {
-    cookie(name, null, { path: '/' });
-  }
 }
