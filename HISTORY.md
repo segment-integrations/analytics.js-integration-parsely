@@ -1,3 +1,10 @@
+2.1.0 / 2017-01-04
+==================
+
+  * Add Optional Dynamic Pageview Tracking
+  * In-Pixel Metadata
+  * Support `.track()`
+
 2.0.0 / 2016-06-21
 ==================
 
