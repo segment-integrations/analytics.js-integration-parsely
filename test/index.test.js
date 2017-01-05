@@ -7,6 +7,7 @@ var filter = require('array-filter');
 var integration = require('@segment/analytics.js-integration');
 var sandbox = require('@segment/clear-env');
 var tester = require('@segment/analytics.js-integration-tester');
+var json = require('json3');
 
 describe('Parsely', function() {
   var analytics;
@@ -131,7 +132,10 @@ describe('Parsely', function() {
           author: 'Chris Sperandio'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
-        analytics.deepEqual(args[0][0].metadata, '{"creator":"Chris Sperandio","url":"http://localhost:9876/context.html"}');
+        analytics.deepEqual(json.parse(args[0][0].metadata), {
+          creator: 'Chris Sperandio',
+          url: 'http://localhost:9876/context.html'
+        });
       });
     });
 
