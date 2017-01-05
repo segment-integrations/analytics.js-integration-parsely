@@ -124,17 +124,14 @@ describe('Parsely', function() {
         analytics.assert(!args[0][0].metadata);
       });
 
-      it('should pass metadata when enabled', function() {
+      it('should pass metadata json stringified when enabled', function() {
         parsely.options.dynamicTracking = true;
         parsely.options.inPixelMetadata = true;
         analytics.page({
           author: 'Chris Sperandio'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
-        analytics.deepEqual(args[0][0].metadata, {
-          creator: 'Chris Sperandio',
-          url: document.location.href
-        });
+        analytics.deepEqual(args[0][0].metadata, '{"creator":"Chris Sperandio","url":"http://localhost:9876/context.html"}');
       });
     });
 
