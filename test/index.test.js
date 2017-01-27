@@ -16,7 +16,8 @@ describe('Parsely', function() {
     apiKey: 'example.com',
     dynamicTracking: false,
     inPixelMetadata: false,
-    trackEvents: false
+    trackEvents: false,
+    customMapping: {}
   };
 
   beforeEach(function() {
@@ -135,6 +136,39 @@ describe('Parsely', function() {
         analytics.deepEqual(json.parse(args[0][0].metadata), {
           creator: 'Chris Sperandio',
           url: 'http://localhost:9876/context.html'
+        });
+      });
+
+      it('should let you override default metadata with custom mapping', function() {
+        parsely.options.dynamicTracking = true;
+        parsely.options.inPixelMetadata = true;
+        parsely.options.customMapping = {
+          kanye: 'articleSection',
+          drake: 'thumbnailUrl',
+          weezy: 'dateCreated',
+          breezy: 'headline',
+          jeezy: 'keywords',
+          kdot: 'creator',
+          weeknd: 'url'
+        };
+        analytics.page({
+          kanye: 'father stretch my hands pt.1',
+          drake: 'started from the bottom',
+          weezy: 'running back',
+          breezy: 'loyal',
+          jeezy: 'put on',
+          kdot: 'm.A.A.d city',
+          weeknd: 'Reminder'
+        });
+        var args = window.PARSELY.beacon.trackPageView.args;
+        analytics.deepEqual(json.parse(args[0][0].metadata), {
+          articleSection: 'father stretch my hands pt.1',
+          thumbnailUrl: 'started from the bottom',
+          dateCreated: 'running back',
+          headline: 'loyal',
+          keywords: 'put on',
+          creator: 'm.A.A.d city',
+          url: 'Reminder'
         });
       });
     });
