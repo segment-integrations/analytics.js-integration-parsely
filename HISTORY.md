@@ -1,3 +1,8 @@
+2.2.0 / 2017-01-27
+==================
+
+  * Adds ability to support custom mapping for in pixel metadata 
+
 2.1.1 / 2017-01-04
 ==================
 
