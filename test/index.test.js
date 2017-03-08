@@ -143,13 +143,14 @@ describe('Parsely', function() {
         parsely.options.dynamicTracking = true;
         parsely.options.inPixelMetadata = true;
         parsely.options.customMapping = {
-          kanye: 'articleSection',
-          drake: 'thumbnailUrl',
-          weezy: 'dateCreated',
-          breezy: 'headline',
-          jeezy: 'keywords',
-          kdot: 'creator',
-          weeknd: 'url'
+          kanye: 'section',
+          drake: 'image_url',
+          weezy: 'pub_date',
+          breezy: 'title',
+          jeezy: 'tags',
+          kdot: 'authors',
+          weeknd: 'link',
+          type: 'page_type'
         };
         analytics.page({
           kanye: 'father stretch my hands pt.1',
@@ -158,17 +159,19 @@ describe('Parsely', function() {
           breezy: 'loyal',
           jeezy: 'put on',
           kdot: 'm.A.A.d city',
-          weeknd: 'Reminder'
+          weeknd: 'Reminder',
+          type: 'index'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
         analytics.deepEqual(json.parse(args[0][0].metadata), {
-          articleSection: 'father stretch my hands pt.1',
-          thumbnailUrl: 'started from the bottom',
-          dateCreated: 'running back',
-          headline: 'loyal',
-          keywords: 'put on',
-          creator: 'm.A.A.d city',
-          url: 'Reminder'
+          section: 'father stretch my hands pt.1',
+          image_url: 'started from the bottom',
+          pub_date: 'running back',
+          title: 'loyal',
+          tags: 'put on',
+          authors: ['m.A.A.d city'],
+          link: 'Reminder',
+          page_type: 'index'
         });
       });
     });
