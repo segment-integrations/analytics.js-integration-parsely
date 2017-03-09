@@ -167,13 +167,12 @@ describe('Parsely', function() {
           ptype: 'index'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
-        console.log(json.parse(args[0][0].metadata));
         analytics.deepEqual(json.parse(args[0][0].metadata), {
           section: 'father stretch my hands pt.1',
           image_url: 'started from the bottom',
           pub_date: 'running back',
           title: 'loyal',
-          tags: 'put on',
+          tags: ['put on'],
           authors: ['m.A.A.d city'],
           link: 'Reminder',
           page_type: 'index'
