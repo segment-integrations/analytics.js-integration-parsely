@@ -129,13 +129,17 @@ describe('Parsely', function() {
       it('should pass metadata json stringified when enabled', function() {
         parsely.options.dynamicTracking = true;
         parsely.options.inPixelMetadata = true;
+        parsely.options.customMapping = { author: 'authors' };
         analytics.page({
+          title: 'sup?',
           author: 'Chris Sperandio'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
         analytics.deepEqual(json.parse(args[0][0].metadata), {
-          creator: 'Chris Sperandio',
-          url: 'http://localhost:9876/context.html'
+          authors: ['Chris Sperandio'],
+          link: 'http://localhost:9876/context.html',
+          page_type: 'post',
+          title: 'sup?'
         });
       });
 
@@ -150,7 +154,7 @@ describe('Parsely', function() {
           jeezy: 'tags',
           kdot: 'authors',
           weeknd: 'link',
-          type: 'page_type'
+          ptype: 'page_type'
         };
         analytics.page({
           kanye: 'father stretch my hands pt.1',
@@ -160,9 +164,10 @@ describe('Parsely', function() {
           jeezy: 'put on',
           kdot: 'm.A.A.d city',
           weeknd: 'Reminder',
-          type: 'index'
+          ptype: 'index'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
+        console.log(json.parse(args[0][0].metadata));
         analytics.deepEqual(json.parse(args[0][0].metadata), {
           section: 'father stretch my hands pt.1',
           image_url: 'started from the bottom',
