@@ -129,13 +129,17 @@ describe('Parsely', function() {
       it('should pass metadata json stringified when enabled', function() {
         parsely.options.dynamicTracking = true;
         parsely.options.inPixelMetadata = true;
+        parsely.options.customMapping = { author: 'authors' };
         analytics.page({
+          title: 'sup?',
           author: 'Chris Sperandio'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
         analytics.deepEqual(json.parse(args[0][0].metadata), {
-          creator: 'Chris Sperandio',
-          url: 'http://localhost:9876/context.html'
+          authors: ['Chris Sperandio'],
+          link: 'http://localhost:9876/context.html',
+          page_type: 'post',
+          title: 'sup?'
         });
       });
 
@@ -143,13 +147,14 @@ describe('Parsely', function() {
         parsely.options.dynamicTracking = true;
         parsely.options.inPixelMetadata = true;
         parsely.options.customMapping = {
-          kanye: 'articleSection',
-          drake: 'thumbnailUrl',
-          weezy: 'dateCreated',
-          breezy: 'headline',
-          jeezy: 'keywords',
-          kdot: 'creator',
-          weeknd: 'url'
+          kanye: 'section',
+          drake: 'image_url',
+          weezy: 'pub_date',
+          breezy: 'title',
+          jeezy: 'tags',
+          kdot: 'authors',
+          weeknd: 'link',
+          ptype: 'page_type'
         };
         analytics.page({
           kanye: 'father stretch my hands pt.1',
@@ -158,17 +163,19 @@ describe('Parsely', function() {
           breezy: 'loyal',
           jeezy: 'put on',
           kdot: 'm.A.A.d city',
-          weeknd: 'Reminder'
+          weeknd: 'Reminder',
+          ptype: 'index'
         });
         var args = window.PARSELY.beacon.trackPageView.args;
         analytics.deepEqual(json.parse(args[0][0].metadata), {
-          articleSection: 'father stretch my hands pt.1',
-          thumbnailUrl: 'started from the bottom',
-          dateCreated: 'running back',
-          headline: 'loyal',
-          keywords: 'put on',
-          creator: 'm.A.A.d city',
-          url: 'Reminder'
+          section: 'father stretch my hands pt.1',
+          image_url: 'started from the bottom',
+          pub_date: 'running back',
+          title: 'loyal',
+          tags: ['put on'],
+          authors: ['m.A.A.d city'],
+          link: 'Reminder',
+          page_type: 'index'
         });
       });
     });
