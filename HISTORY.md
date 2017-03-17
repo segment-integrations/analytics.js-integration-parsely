@@ -1,3 +1,8 @@
+2.2.2 / 2017-03-17
+==================
+
+  * Fix publication date field (pub_date_tmsp, not pub_date)
+
 2.2.1 / 2017-03-09
 ==================
 
