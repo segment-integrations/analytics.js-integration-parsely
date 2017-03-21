@@ -149,7 +149,7 @@ describe('Parsely', function() {
         parsely.options.customMapping = {
           kanye: 'section',
           drake: 'image_url',
-          weezy: 'pub_date',
+          weezy: 'pub_date_tmsp',
           breezy: 'title',
           jeezy: 'tags',
           kdot: 'authors',
@@ -170,7 +170,7 @@ describe('Parsely', function() {
         analytics.deepEqual(json.parse(args[0][0].metadata), {
           section: 'father stretch my hands pt.1',
           image_url: 'started from the bottom',
-          pub_date: 'running back',
+          pub_date_tmsp: 'running back',
           title: 'loyal',
           tags: ['put on'],
           authors: ['m.A.A.d city'],
