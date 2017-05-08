@@ -183,6 +183,7 @@ describe('Parsely', function() {
     describe('track', function() {
       beforeEach(function() {
         analytics.stub(window.PARSELY, 'beacon');
+        analytics.stub(window.PARSELY, 'video');
         analytics.stub(window.PARSELY.beacon, 'trackPageView');
       });
 
@@ -209,6 +210,55 @@ describe('Parsely', function() {
         analytics.track('test', { testing: 'test' });
         var args = window.PARSELY.beacon.trackPageView.args;
         analytics.deepEqual(args[0][0].data, { testing: 'test' });
+      });
+
+      describe('video support', function() {
+        var assetId = '12345';
+
+        beforeEach(function() {
+          analytics.stub(window.PARSELY.video, 'trackPlay');
+          analytics.stub(window.PARSELY.video, 'trackPause');
+          analytics.stub(window.PARSELY.video, 'reset');
+        });
+
+        it('should track content view starts', function() {
+          analytics.track('Video Content Started', {
+            assetId: assetId,
+            airdate: 'Mon May 08 2017 11:00:34 GMT-0700 (PDT)',
+            genre: 'Sports',
+            publisher: 'Chris Nixon',
+            tags: ['hockey', 'henrik lundquist', 'rangers']
+          });
+          var args = window.PARSELY.video.trackPlay.args;
+          analytics.equal(args[0][0], assetId);
+          analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
+        });
+
+        it('should track playback paused events', function() {
+          analytics.track('Video Playback Paused', {
+            assetId: assetId,
+            airdate: 'Mon May 08 2017 11:00:34 GMT-0700 (PDT)',
+            genre: 'Sports',
+            publisher: 'Chris Nixon',
+            tags: ['hockey', 'henrik lundquist', 'rangers']
+          });
+          var args = window.PARSELY.video.trackPause.args;
+          analytics.equal(args[0][0], assetId);
+          analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
+        });
+
+        it('should track playback interrupted events', function() {
+          analytics.track('Video Playback Interrupted', { assetId: assetId });
+          var args = window.PARSELY.video.reset.args;
+          analytics.equal(args[0][0], assetId);
+        });
+
+        // TODO: is this desired behavior?
+        it('should also send video events as custom events', function() {
+          parsely.options.trackEvents = true;
+          analytics.track('Video Playback Interrupted', { assetId: assetId });
+          analytics.called(window.PARSELY.beacon.trackPageView);
+        });
       });
     });
   });
