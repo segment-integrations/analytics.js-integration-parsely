@@ -227,11 +227,17 @@ describe('Parsely', function() {
             airdate: 'Mon May 08 2017 11:00:34 GMT-0700 (PDT)',
             genre: 'Sports',
             publisher: 'Chris Nixon',
-            tags: ['hockey', 'henrik lundquist', 'rangers']
+            keywords: ['hockey', 'henrik lundquist', 'rangers']
+          }, {
+            integrations: {
+              Parsely: {
+                imageUrl: 'http://logo.com'
+              }
+            }
           });
           var args = window.PARSELY.video.trackPlay.args;
           analytics.equal(args[0][0], assetId);
-          analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
+          analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, image_url: 'http://logo.com', section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
         });
 
         it('should track playback paused events', function() {
@@ -239,12 +245,18 @@ describe('Parsely', function() {
             assetId: assetId,
             airdate: 'Mon May 08 2017 11:00:34 GMT-0700 (PDT)',
             genre: 'Sports',
-            publisher: 'Chris Nixon',
-            tags: ['hockey', 'henrik lundquist', 'rangers']
+            publisher: 'Chris Nixon'
+          }, {
+            integrations: {
+              Parsely: {
+                imageUrl: 'http://logo.com',
+                tags: ['hockey', 'henrik lundquist', 'rangers']
+              }
+            }
           });
           var args = window.PARSELY.video.trackPause.args;
           analytics.equal(args[0][0], assetId);
-          analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
+          analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, image_url: 'http://logo.com', section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
         });
 
         it('should track playback interrupted events', function() {
