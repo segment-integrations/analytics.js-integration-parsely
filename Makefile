@@ -75,6 +75,6 @@ test-browser: install
 	@$(KARMA) start $(KARMA_FLAGS) $(KARMA_CONF)
 
 # Default test target.
-test: install lint test-browser
+test: lint test-browser
 .PHONY: test
 .DEFAULT_GOAL = test
