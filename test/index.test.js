@@ -259,6 +259,25 @@ describe('Parsely', function() {
           analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, image_url: 'http://logo.com', section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
         });
 
+        it('should fallback on CURRENT_VIDEO_METADATA global', function() {
+          analytics.track('Video Content Started', {
+            assetId: assetId,
+            airdate: 'Mon May 08 2017 11:00:34 GMT-0700 (PDT)',
+            genre: 'Sports',
+            publisher: 'Chris Nixon',
+            keywords: ['hockey', 'henrik lundquist', 'rangers']
+          }, {
+            integrations: {
+              Parsely: {
+                imageUrl: 'http://logo.com'
+              }
+            }
+          });
+          analytics.track('Video Playback Paused');
+          var args = window.PARSELY.video.trackPause.args;
+          analytics.deepEqual(args[0][1], { pub_date_tmsp: 1494266434000, image_url: 'http://logo.com', section: 'Sports', authors: ['Chris Nixon'], tags: ['hockey', 'henrik lundquist', 'rangers'] });
+        });
+
         it('should track playback interrupted events', function() {
           analytics.track('Video Playback Interrupted', { assetId: assetId });
           var args = window.PARSELY.video.reset.args;
