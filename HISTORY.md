@@ -1,3 +1,8 @@
+2.3.1 / 2017-08-28
+==================
+
+  * Fix trackPause to more closely align with our spec.
+
 2.3.0 / 2017-05-16
 ==================
 
